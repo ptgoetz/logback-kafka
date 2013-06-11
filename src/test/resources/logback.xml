@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<configuration>
+	<appender name="KAFKA"
+		class="com.github.ptgoetz.logback.kafka.KafkaAppender">
+		<topic>mytopic</topic>
+		<zookeeperHost>localhost:2181</zookeeperHost>
+	</appender>
+	<root level="debug">
+		<appender-ref ref="KAFKA" />
+	</root>
+</configuration>
