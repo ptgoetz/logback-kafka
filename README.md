@@ -35,7 +35,7 @@ a zookeeper host string, and kafka topic name to log to.
 </configuration>
 ```
 
-## Default Behavior
+## Overriding Default Behavior
 By default, the Kafka appender will simply write the received log message to the kafka queue. You can override this 
 behavior by specifying a custom formatter class:
 
@@ -62,4 +62,22 @@ behavior by specifying a custom formatter class:
     </root>
 </configuration>
 ```
+
+
+
+Formatters simply need to implement the `com.github.ptgoetz.logback.kafka.formatter.Formatter` interface:
+
+```java
+package com.github.ptgoetz.logback.kafka.formatter;
+
+import ch.qos.logback.classic.spi.ILoggingEvent;
+
+public interface Formatter {
+    String format(ILoggingEvent event);
+}
+```
+
+You can find the `ch.qos.logback.classic.spi.ILoggingEvent` javadoc [here](http://logback.qos.ch/apidocs/ch/qos/logback/classic/spi/ILoggingEvent.html).
+
+
 
