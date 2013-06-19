@@ -12,64 +12,60 @@ import com.github.ptgoetz.logback.kafka.formatter.Formatter;
 import com.github.ptgoetz.logback.kafka.formatter.MessageFormatter;
 
 public class KafkaAppender extends AppenderBase<ILoggingEvent> {
-	
-	private String topic;
-	private String zookeeperHost;
-	private Producer<String, String> producer;
-	private Formatter formatter;
-	
-	
 
-	public String getTopic() {
-		return topic;
-	}
+    private String topic;
+    private String zookeeperHost;
+    private Producer<String, String> producer;
+    private Formatter formatter;
 
-	public void setTopic(String topic) {
-		this.topic = topic;
-	}
+    public String getTopic() {
+        return topic;
+    }
 
-	public String getZookeeperHost() {
-		return zookeeperHost;
-	}
+    public void setTopic(String topic) {
+        this.topic = topic;
+    }
 
-	public void setZookeeperHost(String zookeeperHost) {
-		this.zookeeperHost = zookeeperHost;
-	}
+    public String getZookeeperHost() {
+        return zookeeperHost;
+    }
 
-	public Formatter getFormatter() {
-		return formatter;
-	}
+    public void setZookeeperHost(String zookeeperHost) {
+        this.zookeeperHost = zookeeperHost;
+    }
 
-	public void setFormatter(Formatter formatter) {
-		this.formatter = formatter;
-	}
+    public Formatter getFormatter() {
+        return formatter;
+    }
 
-	@Override
-	public void start() {
-		if(this.formatter == null){
-			this.formatter = new MessageFormatter();
-		}
-		super.start();		
-		Properties props = new Properties();
-		props.put("zk.connect", this.zookeeperHost);
-		props.put("serializer.class", "kafka.serializer.StringEncoder");
-		ProducerConfig config = new ProducerConfig(props);
-		this.producer = new Producer<String, String>(config);
-	}
-	
-	
+    public void setFormatter(Formatter formatter) {
+        this.formatter = formatter;
+    }
 
-	@Override
-	public void stop() {
-		super.stop();
-		this.producer.close();
-	}
+    @Override
+    public void start() {
+        if (this.formatter == null) {
+            this.formatter = new MessageFormatter();
+        }
+        super.start();
+        Properties props = new Properties();
+        props.put("zk.connect", this.zookeeperHost);
+        props.put("serializer.class", "kafka.serializer.StringEncoder");
+        ProducerConfig config = new ProducerConfig(props);
+        this.producer = new Producer<String, String>(config);
+    }
 
-	@Override
-	protected void append(ILoggingEvent event) {
-		String payload = this.formatter.format(event);
-		ProducerData<String, String> data = new ProducerData<String, String>(this.topic, payload);
-		this.producer.send(data);
-	}
+    @Override
+    public void stop() {
+        super.stop();
+        this.producer.close();
+    }
+
+    @Override
+    protected void append(ILoggingEvent event) {
+        String payload = this.formatter.format(event);
+        ProducerData<String, String> data = new ProducerData<String, String>(this.topic, payload);
+        this.producer.send(data);
+    }
 
 }

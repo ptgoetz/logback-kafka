@@ -7,8 +7,35 @@
 	<version>0.1.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
+	<parent>
+		<groupId>org.sonatype.oss</groupId>
+		<artifactId>oss-parent</artifactId>
+		<version>7</version>
+	</parent>
+
 	<name>logback-kafka</name>
 	<url>http://maven.apache.org</url>
+
+	<licenses>
+		<license>
+			<name>Eclipse Public License - v 1.0</name>
+			<url>http://www.eclipse.org/legal/epl-v10.html</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+	<scm>
+		<connection>scm:git:git@github.com:ptgoetz/logback-kafka.git</connection>
+		<developerConnection>scm:git:git@github.com:ptgoetz/logback-kafka.git</developerConnection>
+		<url>:git@github.com:ptgoetz/logback-kafka.git</url>
+	</scm>
+
+	<developers>
+		<developer>
+			<id>ptgoetz</id>
+			<name>P. Taylor Goetz</name>
+			<email>ptgoetz@gmail.com</email>
+		</developer>
+	</developers>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
