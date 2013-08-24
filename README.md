@@ -79,5 +79,9 @@ public interface Formatter {
 
 You can find the `ch.qos.logback.classic.spi.ILoggingEvent` javadoc [here](http://logback.qos.ch/apidocs/ch/qos/logback/classic/spi/ILoggingEvent.html).
 
+You can select a specific topic to send log information simply by adding a Marker object:
 
+```
+logger.info(MarkerFactory.getMarker("topic_simpletest"),"Hello World!");
 
+```

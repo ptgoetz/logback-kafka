@@ -2,8 +2,10 @@ package com.github.ptgoetz.logback.kafka;
 
 import java.util.Properties;
 
+import org.slf4j.Marker;
+
 import kafka.javaapi.producer.Producer;
-import kafka.javaapi.producer.ProducerData;
+import kafka.producer.KeyedMessage;
 import kafka.producer.ProducerConfig;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.AppenderBase;
@@ -13,19 +15,26 @@ import com.github.ptgoetz.logback.kafka.formatter.MessageFormatter;
 
 public class KafkaAppender extends AppenderBase<ILoggingEvent> {
 
-    private String topic;
     private String zookeeperHost;
     private Producer<String, String> producer;
     private Formatter formatter;
+	private String brokerList;
+	private String topic;
+	
+	public String getTopic() {
+		return topic;
+	}
 
-    public String getTopic() {
-        return topic;
-    }
+	public void setTopic(String topic) {
+		this.topic = topic;
+	}
 
-    public void setTopic(String topic) {
-        this.topic = topic;
-    }
-
+	public void setBrokerList(String s) {
+		this.brokerList = s;
+	}
+	
+	public String getBrokerList() { return this.brokerList; }
+	
     public String getZookeeperHost() {
         return zookeeperHost;
     }
@@ -50,6 +59,7 @@ public class KafkaAppender extends AppenderBase<ILoggingEvent> {
         super.start();
         Properties props = new Properties();
         props.put("zk.connect", this.zookeeperHost);
+        props.put("metadata.broker.list", this.brokerList);
         props.put("serializer.class", "kafka.serializer.StringEncoder");
         ProducerConfig config = new ProducerConfig(props);
         this.producer = new Producer<String, String>(config);
@@ -63,9 +73,13 @@ public class KafkaAppender extends AppenderBase<ILoggingEvent> {
 
     @Override
     protected void append(ILoggingEvent event) {
+    	Marker marker = event.getMarker();
         String payload = this.formatter.format(event);
-        ProducerData<String, String> data = new ProducerData<String, String>(this.topic, payload);
-        this.producer.send(data);
+        if (marker != null && marker.getName().startsWith("topic")) {
+            this.producer.send(new KeyedMessage<String, String>(marker.getName(), payload));
+        } else {
+            this.producer.send(new KeyedMessage<String, String>(getTopic(), payload));
+        }
     }
 
 }
