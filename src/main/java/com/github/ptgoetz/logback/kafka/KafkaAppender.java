@@ -19,6 +19,15 @@ public class KafkaAppender extends AppenderBase<ILoggingEvent> {
     private Producer<String, String> producer;
     private Formatter formatter;
 	private String brokerList;
+	private String topic;
+	
+	public String getTopic() {
+		return topic;
+	}
+
+	public void setTopic(String topic) {
+		this.topic = topic;
+	}
 
 	public void setBrokerList(String s) {
 		this.brokerList = s;
@@ -65,9 +74,11 @@ public class KafkaAppender extends AppenderBase<ILoggingEvent> {
     @Override
     protected void append(ILoggingEvent event) {
     	Marker marker = event.getMarker();
+        String payload = this.formatter.format(event);
         if (marker != null && marker.getName().startsWith("topic")) {
-            String payload = this.formatter.format(event);
             this.producer.send(new KeyedMessage<String, String>(marker.getName(), payload));
+        } else {
+            this.producer.send(new KeyedMessage<String, String>(getTopic(), payload));
         }
     }
 
