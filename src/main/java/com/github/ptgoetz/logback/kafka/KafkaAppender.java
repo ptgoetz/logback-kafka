@@ -1,37 +1,67 @@
 package com.github.ptgoetz.logback.kafka;
 
-import java.util.Properties;
-
-import kafka.javaapi.producer.Producer;
-import kafka.javaapi.producer.ProducerData;
-import kafka.producer.ProducerConfig;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.AppenderBase;
-
 import com.github.ptgoetz.logback.kafka.formatter.Formatter;
 import com.github.ptgoetz.logback.kafka.formatter.MessageFormatter;
+import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.ProducerRecord;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.StringReader;
+import java.util.Properties;
 
 public class KafkaAppender extends AppenderBase<ILoggingEvent> {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(KafkaAppender.class);
+    private Formatter formatter = new MessageFormatter();
+    private boolean logToSystemOut = false;
+    private String kafkaProducerProperties;
     private String topic;
-    private String zookeeperHost;
-    private Producer<String, String> producer;
-    private Formatter formatter;
+    private KafkaProducer producer;
 
-    public String getTopic() {
-        return topic;
+    @Override
+    public void start() {
+        super.start();
+        LOGGER.info("Starting KafkaAppender...");
+        final Properties properties = new Properties();
+        try {
+            properties.load(new StringReader(kafkaProducerProperties));
+            producer = new KafkaProducer<>(properties);
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
+
+        if (topic == null) {
+            System.out.println("KafkaAppender requires a topic. Add this to the appender configuration.");
+        } else {
+            System.out.println("KafkaAppender will produce messages for the '" + topic + "' topic.");
+        }
+        LOGGER.info("kafkaProducerProperties = {}", kafkaProducerProperties);
+        LOGGER.info("Kafka Producer Properties = {}", properties);
+        if (logToSystemOut) {
+            System.out.println("KafkaAppender: kafkaProducerProperties = '" + kafkaProducerProperties + "'.");
+            System.out.println("KafkaAppender: properties = '" + properties + "'.");
+        }
     }
 
-    public void setTopic(String topic) {
-        this.topic = topic;
+    @Override
+    public void stop() {
+        super.stop();
+        LOGGER.info("Stopping KafkaAppender...");
+        this.producer.close();
     }
 
-    public String getZookeeperHost() {
-        return zookeeperHost;
-    }
-
-    public void setZookeeperHost(String zookeeperHost) {
-        this.zookeeperHost = zookeeperHost;
+    @Override
+    protected void append(ILoggingEvent event) {
+        String string = this.formatter.format(event);
+        LOGGER.trace("Appending string: {}", string);
+        if (logToSystemOut) {
+            System.out.println("KafkaAppender: Appending string: '" + string + "'.");
+        }
+        ProducerRecord<String, String> producerRecord = new ProducerRecord<>(topic, string);
+        this.producer.send(producerRecord);
     }
 
     public Formatter getFormatter() {
@@ -42,30 +72,29 @@ public class KafkaAppender extends AppenderBase<ILoggingEvent> {
         this.formatter = formatter;
     }
 
-    @Override
-    public void start() {
-        if (this.formatter == null) {
-            this.formatter = new MessageFormatter();
+    public String getTopic() {
+        return topic;
+    }
+
+    public void setTopic(String topic) {
+        this.topic = topic;
+    }
+
+    public String getLogToSystemOut() {
+        return logToSystemOut + "";
+    }
+
+    public void setLogToSystemOut(String logToSystemOutString) {
+        if ("true".equalsIgnoreCase(logToSystemOutString)) {
+            this.logToSystemOut = true;
         }
-        super.start();
-        Properties props = new Properties();
-        props.put("zk.connect", this.zookeeperHost);
-        props.put("serializer.class", "kafka.serializer.StringEncoder");
-        ProducerConfig config = new ProducerConfig(props);
-        this.producer = new Producer<String, String>(config);
     }
 
-    @Override
-    public void stop() {
-        super.stop();
-        this.producer.close();
+    public String getKafkaProducerProperties() {
+        return kafkaProducerProperties;
     }
 
-    @Override
-    protected void append(ILoggingEvent event) {
-        String payload = this.formatter.format(event);
-        ProducerData<String, String> data = new ProducerData<String, String>(this.topic, payload);
-        this.producer.send(data);
+    public void setKafkaProducerProperties(String kafkaProducerProperties) {
+        this.kafkaProducerProperties = kafkaProducerProperties;
     }
-
 }

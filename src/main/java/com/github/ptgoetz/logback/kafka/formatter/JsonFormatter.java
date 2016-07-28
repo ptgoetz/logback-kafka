@@ -1,5 +1,6 @@
 package com.github.ptgoetz.logback.kafka.formatter;
 
+import ch.qos.logback.classic.spi.CallerData;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 
 public class JsonFormatter implements Formatter {
@@ -8,6 +9,7 @@ public class JsonFormatter implements Formatter {
     private static final String COMMA = ",";
 
     private boolean expectJson = false;
+    private boolean includeMethodAndLineNumber = false;
 
     public String format(ILoggingEvent event) {
         StringBuilder sb = new StringBuilder();
@@ -27,7 +29,19 @@ public class JsonFormatter implements Formatter {
         } else {
             quote(event.getFormattedMessage(), sb);
         }
-
+        if(includeMethodAndLineNumber) {
+            sb.append(COMMA);
+            // Caller Data
+            StackTraceElement[] callerDataArray = event.getCallerData();
+            if (callerDataArray != null && callerDataArray.length > 0) {
+                StackTraceElement stackTraceElement = callerDataArray[0];
+                fieldName("method", sb);
+                quote(stackTraceElement.getMethodName(), sb);
+                sb.append(COMMA);
+                fieldName("lineNumber", sb);
+                quote(stackTraceElement.getLineNumber() + "", sb);
+            }
+        }
         sb.append("}");
         return sb.toString();
     }
@@ -43,11 +57,19 @@ public class JsonFormatter implements Formatter {
         sb.append(QUOTE);
     }
 
-    public boolean isExpectJson() {
+    public boolean getExpectJson() {
         return expectJson;
     }
 
     public void setExpectJson(boolean expectJson) {
         this.expectJson = expectJson;
+    }
+
+    public boolean getIncludeMethodAndLineNumber() {
+        return includeMethodAndLineNumber;
+    }
+
+    public void setIncludeMethodAndLineNumber(boolean includeMethodAndLineNumber) {
+        this.includeMethodAndLineNumber = includeMethodAndLineNumber;
     }
 }
