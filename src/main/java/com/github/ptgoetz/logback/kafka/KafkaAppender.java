@@ -34,9 +34,11 @@ public class KafkaAppender extends AppenderBase<ILoggingEvent> {
         }
 
         if (topic == null) {
+            LOGGER.error("KafkaAppender requires a topic. Add this to the appender configuration.");
             System.out.println("KafkaAppender requires a topic. Add this to the appender configuration.");
         } else {
-            System.out.println("KafkaAppender will produce messages for the '" + topic + "' topic.");
+            LOGGER.info("KafkaAppender will publish messages to the '{}' topic.",topic);
+            System.out.println("KafkaAppender will publish messages to the '" + topic + "' topic.");
         }
         LOGGER.info("kafkaProducerProperties = {}", kafkaProducerProperties);
         LOGGER.info("Kafka Producer Properties = {}", properties);
@@ -56,7 +58,6 @@ public class KafkaAppender extends AppenderBase<ILoggingEvent> {
     @Override
     protected void append(ILoggingEvent event) {
         String string = this.formatter.format(event);
-        LOGGER.trace("Appending string: {}", string);
         if (logToSystemOut) {
             System.out.println("KafkaAppender: Appending string: '" + string + "'.");
         }

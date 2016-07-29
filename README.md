@@ -17,9 +17,16 @@ To use logback-kafka in your project add to following to your pom.xml:
 
 ## Configuration
 
-To configure your application to log to kafka, add an appender entry in your logback configuration file, and specify
-a zookeeper host string, and kafka topic name to log to.
+To configure your application to log to kafka, add an appender entry in 
+your logback configuration file, a kafka topic name to log to, 
+and specify your Kafka Producer Properties. At a minimum, you must 
+provide the 'bootstrap.servers' property. Al the properties you submit 
+will be passed on to the Kafka Producer. A guide to the properties can 
+be found here: 
+https://kafka.apache.org/documentation.html#producerconfigs
 
+There is also an option to log to System out,
+ as a sanity check while setting up.
 
 ```xml
 <?xml version="1.0" encoding="UTF-8" ?>
@@ -27,9 +34,6 @@ a zookeeper host string, and kafka topic name to log to.
     <appender name="KAFKA"
         class="com.github.ptgoetz.logback.kafka.KafkaAppender">
         <topic>mytopic</topic>
-        <!-- Any configuration property defined here
-        https://kafka.apache.org/documentation.html#producerconfigs
-        will be passed through to the Kafka Producer: -->
         <kafkaProducerProperties>
             bootstrap.servers=127.0.0.1:9092
             acks=all
@@ -43,8 +47,9 @@ a zookeeper host string, and kafka topic name to log to.
 ```
 
 ## Overriding Default Behavior
-By default, the Kafka appender will simply write the received log message to the kafka queue. You can override this
-behavior by specifying a custom formatter class:
+By default, the Kafka appender will simply write the received log 
+message to the kafka queue. You can override this behavior by 
+specifying a custom formatter class:
 
 ```xml
 <?xml version="1.0" encoding="UTF-8" ?>
@@ -77,7 +82,6 @@ behavior by specifying a custom formatter class:
     </root>
 </configuration>
 ```
-
 
 
 Formatters simply need to implement the `com.github.ptgoetz.logback.kafka.formatter.Formatter` interface:
