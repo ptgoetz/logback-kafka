@@ -17,16 +17,14 @@ To use logback-kafka in your project add to following to your pom.xml:
 
 ## Configuration
 
-To configure your application to log to kafka, add an appender entry in 
-your logback configuration file, a kafka topic name to log to, 
-and specify your Kafka Producer Properties. At a minimum, you must 
-provide the 'bootstrap.servers' property. Al the properties you submit 
-will be passed on to the Kafka Producer. A guide to the properties can 
-be found here: 
-https://kafka.apache.org/documentation.html#producerconfigs
+To configure your application to log to Kafka, add an appender entry in 
+your logback configuration file, a Kafka topic name to log to, 
+and specify your Kafka Producer properties. At a minimum, you must 
+provide the 'bootstrap.servers' property. The properties you submit 
+will be passed on to the Kafka Producer. A complete guide to the Producer 
+properties can be found [here](https://kafka.apache.org/documentation.html#producerconfigs).
 
-There is also an option to log to System out,
- as a sanity check while setting up.
+An option to log to System out is provided as a sanity check while setting up.
 
 ```xml
 <?xml version="1.0" encoding="UTF-8" ?>
@@ -82,7 +80,6 @@ specifying a custom formatter class:
     </root>
 </configuration>
 ```
-
 
 Formatters simply need to implement the `com.github.ptgoetz.logback.kafka.formatter.Formatter` interface:
 
