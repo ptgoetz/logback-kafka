@@ -20,8 +20,8 @@ To use logback-kafka in your project add to following to your pom.xml:
 To configure your application to log to Kafka, add an appender entry in 
 your logback configuration file, a Kafka topic name to log to, 
 and specify your Kafka Producer properties. At a minimum, you must 
-provide the 'bootstrap.servers' property. The properties you submit 
-will be passed on to the Kafka Producer. A complete guide to the Producer 
+provide the 'bootstrap.servers', 'key.serializer', and 'value.serializer' properties. 
+The properties you submit will be passed on to the Kafka Producer. A complete guide to the Producer 
 properties can be found [here](https://kafka.apache.org/documentation.html#producerconfigs).
 
 An option to log to System out is provided as a sanity check while setting up.
@@ -34,7 +34,8 @@ An option to log to System out is provided as a sanity check while setting up.
         <topic>mytopic</topic>
         <kafkaProducerProperties>
             bootstrap.servers=127.0.0.1:9092
-            acks=all
+            value.serializer=org.apache.kafka.common.serialization.StringSerializer
+            key.serializer=org.apache.kafka.common.serialization.StringSerializer
         </kafkaProducerProperties>
         <logToSystemOut>true</logToSystemOut>
     </appender>
@@ -60,7 +61,8 @@ specifying a custom formatter class:
         will be passed through to the Kafka Producer: -->
         <kafkaProducerProperties>
             bootstrap.servers=127.0.0.1:9092
-            acks=all
+            value.serializer=org.apache.kafka.common.serialization.StringSerializer
+            key.serializer=org.apache.kafka.common.serialization.StringSerializer
         </kafkaProducerProperties>
         <!-- specify a custom formatter -->
         <formatter class="com.github.ptgoetz.logback.kafka.formatter.JsonFormatter">
